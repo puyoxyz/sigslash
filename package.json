@@ -1,24 +1,26 @@
 {
-  "name": "bot-ts",
-  "version": "1.0.0",
-  "description": "Bot template with TypeScript, DiscordJS and DiscordJS Commando",
+  "name": "sigslash",
+  "version": "0.0.1-indev",
+  "description": "sig but slash",
   "main": "entry.js",
   "scripts": {
     "start": "node ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daniel11420/bot-ts"
+    "url": "git+https://github.com/daniel11420/sigslash"
   },
   "keywords": [
-    "discord"
+    "discord",
+    "sig",
+    "shigu"
   ],
   "author": "daniel11420",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/daniel11420/bot/issues"
+    "url": "https://github.com/daniel11420/sigslash/issues"
   },
-  "homepage": "https://github.com/daniel11420/bot-ts#readme",
+  "homepage": "https://github.com/daniel11420/sigslash#readme",
   "dependencies": {
     "@types/node": "^14.0.5",
     "better-sqlite3": "^7.0.1",
