@@ -2,10 +2,10 @@
 let required_config_version: number = 1;
 
 // Check if config version correct
-let fs = require('fs');
-declare var config; // this makes it, like, global or whatever, so it can be used everywhere
-config = fs.readFileSync('../local/config.json');
-config = JSON.parse(config);
+import * as fs from 'fs';
+let buffer = fs.readFileSync('./local/config.json');
+let config = JSON.parse(buffer.toString());
+buffer = undefined;
 
 if (config.config_version == required_config_version) {
     console.log("Config version correct, starting.");

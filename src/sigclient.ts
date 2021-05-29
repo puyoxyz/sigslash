@@ -1,12 +1,17 @@
 import * as discordjs from 'discord.js';
+import * as fs from 'fs';
+let config = fs.readFileSync('./local/config.json');
+config = JSON.parse(config.toString());
 
 export class SigClient {
     client: discordjs.Client;
+    owner: string;
     commands: Array<discordjs.ApplicationCommandData>;
     registeredGuildCommands: Array<String>;
     registeredGlobalCommands: Object;
 
-    constructor(packageInfo: Object) {
+    constructor(packageInfo: Object, owner: string) {
+        this.owner = owner;
         this.commands = [];
         this.registeredGuildCommands = [];
         this.registeredGlobalCommands = {};
@@ -21,7 +26,7 @@ export class SigClient {
                 message.reply("Hi! I only respond to slash commands. You can see a list by typing `/` and clicking the Sig icon!");
             }
 
-            if (message.author.id == config.owner && message.content.toLowerCase().includes("deploy test commands")) {
+            if (message.author.id == this.owner && message.content.toLowerCase().includes("deploy test commands")) {
                 message.reply("Hello, " + message.author.tag + ". Deploying guild commands!");
                 if (!this.registeredGuildCommands[message.guild.id]) {
                     this.registeredGuildCommands[message.guild.id] = [];

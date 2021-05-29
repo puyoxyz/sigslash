@@ -2,9 +2,12 @@
   "name": "sigslash",
   "version": "0.0.1-indev",
   "description": "sig but slash",
-  "main": "entry.js",
+  "main": "dist/entry.js",
   "scripts": {
-    "start": "node ."
+    "start-built": "node .",
+    "build": "tsc",
+    "prestart": "npm run build",
+    "start": "npm run start-built"
   },
   "repository": {
     "type": "git",
@@ -22,13 +25,17 @@
   },
   "homepage": "https://github.com/daniel11420/sigslash#readme",
   "dependencies": {
-    "@types/node": "^14.0.5",
     "discord-api-types": "^0.18.1",
     "discord.js": "github:monbrey/discord.js#message-components",
-    "figlet": "^1.4.0",
+    "figlet": "^1.5.0",
     "fs": "0.0.1-security",
     "lodash": "^4.17.21",
-    "table": "^5.4.6",
+    "table": "^6.3.2"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.1",
+    "@types/lodash": "^4.14.170",
+    "@types/node": "^14.0.5",
     "typescript": "^4.3.2"
   }
 }

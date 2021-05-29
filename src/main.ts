@@ -1,22 +1,27 @@
 import * as discordjs from 'discord.js';
-import * as path from 'path';
 import { table } from 'table';
 import * as figlet from 'figlet';
 import * as lodash from 'lodash';
-import * as packageInfo from './package.json';
-import * as triviaQuestions from './trivia.json';
+import * as fs from 'fs';
+let buffer: Buffer;
+buffer = fs.readFileSync('./local/config.json');
+let config = JSON.parse(buffer.toString());
+buffer = fs.readFileSync('./package.json');
+let packageInfo = JSON.parse(buffer.toString());
+buffer = fs.readFileSync('./local/trivia.json');
+let triviaQuestions = JSON.parse(buffer.toString());
+buffer = undefined;
 
 import { SigClient } from './sigclient';
 
-// SET UP CLIENT HERE
-const sig = new SigClient(packageInfo);
+const sig = new SigClient(packageInfo, config.owner);
 let runningTrivias: Array<Object> = [];
-let runningPolls: Array<Object> = [];
+//let runningPolls: Array<Object> = [];
 
 // SET UP DATABASE HERE
 
 sig.client.once('ready', async () => {
-    await sig.client.user.setActivity(config.activity.text, {type: config.activity.type}) // Setting the activity
+    sig.client.user.setActivity(config.activity.text, {type: config.activity.type}) // Setting the activity
     console.log("I WOULD LOG THAT WE CHANGED THE PRESENCE HERE BUT APPARENTLY PROMISES ARE CRINGE NOW!!!!! THANKS DJS");
     
     // Logging basic info
@@ -167,7 +172,7 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
         if (triviaInfo != undefined) {
             // add check for who pressed the button here
             let actionRow = new discordjs.MessageActionRow();
-            triviaInfo["answers"].forEach((answer, index) => {
+            triviaInfo["answers"].forEach((answer: string, index: number) => {
                 let style: discordjs.MessageButtonStyle = 'PRIMARY';
                 if (index == triviaInfo["correctIndex"]) {
                     style = 'SUCCESS';
