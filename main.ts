@@ -1,30 +1,192 @@
-import * as Discord from 'discord.js';
+import * as discordjs from 'discord.js';
 import * as path from 'path';
 import { table } from 'table';
 import * as figlet from 'figlet';
-import * as package_json from './package.json';
-let name = package_json.name;
+import * as lodash from 'lodash';
+import * as packageInfo from './package.json';
+import * as triviaQuestions from './trivia.json';
+
+import { SigClient } from './sigclient';
 
 // SET UP CLIENT HERE
+const sig = new SigClient(packageInfo);
+let runningTrivias: Array<Object> = [];
+let runningPolls: Array<Object> = [];
 
 // SET UP DATABASE HERE
 
-client.on('ready', async () => {
-    await client.user.setActivity(config.activity.text, {type: config.activity.type}) // Setting the activity
-        .then(presence => console.log(`Activity set successfully: ${presence.activities[0].type} ${presence.activities[0].name}`)) // Log activity
-        .catch(console.error);
+sig.client.once('ready', async () => {
+    await sig.client.user.setActivity(config.activity.text, {type: config.activity.type}) // Setting the activity
+    console.log("I WOULD LOG THAT WE CHANGED THE PRESENCE HERE BUT APPARENTLY PROMISES ARE CRINGE NOW!!!!! THANKS DJS");
     
     // Logging basic info
-    console.log(figlet.textSync(name));
-    console.log(package_json.description);
+    console.log(figlet.textSync(packageInfo.name));
+    console.log(packageInfo.description);
     console.log(table([
-        ['Account', client.user.tag],
+        ['Account', sig.client.user.tag],
         ['Activity', `${config.activity.type} ${config.activity.text}`],
-        ['Help (Default)', `${config.prefix}help`],
-        [`${name} info`, `${name} version ${package_json.version}\n${package_json.license}\nCopyright ${package_json.author} (c) 2021`]
+        ['Help (Default)', `Slash command menu`],
+        [`${packageInfo.name} info`, `${packageInfo.name} version ${packageInfo.version}\n${packageInfo.license}\nCopyright ${packageInfo.author} (c) 2021`]
     ]));
 });
 
-// REGISTER COMMANDS HERE?!?!?!?!?!
+sig.login(config.token);
+sig.commands.push({
+    name: 'ping',
+    description: 'Test command'
+});
+sig.commands.push({
+    name: 'showcase',
+    description: 'Showcases of new bot API features (specifically Interactions)',
+    options: [
+        {
+            name: 'trivia',
+            type: 'SUB_COMMAND',
+            description: 'Random quiz/trivia using MessageButtons'
+        },
+        {
+            name: 'ephemeral',
+            type: 'SUB_COMMAND',
+            description: 'Sends a message that only you can see'
+        },
+        {
+            name: 'poll',
+            type: 'SUB_COMMAND',
+            description: 'Makes a poll with buttons that people can vote on (2-4 choices) which ends in 10 minutes',
+            options: [
+                {
+                    name: 'first_option',
+                    type: 'STRING',
+                    description: 'Poll option',
+                    required: true
+                },
+                {
+                    name: 'second_option',
+                    type: 'STRING',
+                    description: 'Poll option',
+                    required: true
+                },
+                {
+                    name: 'third_option',
+                    type: 'STRING',
+                    description: 'Poll option'
+                },
+                {
+                    name: 'fourth_option',
+                    type: 'STRING',
+                    description: 'Poll option'
+                }
+            ]
+        }
+    ]
+})
 
-client.login(config.token)
+sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
+    if (interaction.isCommand()) {
+        let commandInteraction = interaction as discordjs.CommandInteraction;
+        switch(commandInteraction.commandName) {
+            case 'ping':
+                let dripButton = new discordjs.MessageButton()
+                    .setLabel('DRIP')
+                    .setStyle('LINK')
+                    .setURL('https://drip-car.me');
+                let actionRow = new discordjs.MessageActionRow()
+                    .addComponent(dripButton)
+                    .addComponent(dripButton)
+                    .addComponent(dripButton)
+                    .addComponent(dripButton)
+                    .addComponent(dripButton);
+                await commandInteraction.reply('Pong! Client ping: ' + sig.client.ws.ping + 'ms', { components: [actionRow] })
+                    .catch(error => console.error(error));
+                break;
+            case 'showcase':
+                //commandInteraction.defer();
+                if (commandInteraction.options.find(option => option.name == 'ephemeral')) {
+                    await commandInteraction.reply('I was hula hooping. Kevin and I attend a class for fitness and for fun.\nI\'ve mastered all the moves: the pizza toss, the tornado, the scorpion, the oopsie-doodle.\nBut because this is an ephemeral message, noone will ever believe you.\nhttps://image-host.club/QgxfaXOz.png', {
+                        ephemeral: true
+                    })
+                        .catch(error => console.error(error));
+                } else if (commandInteraction.options.find(option => option.name == 'trivia')) {
+                    let questionObject = lodash.sampleSize(triviaQuestions, 1);
+                    questionObject = questionObject[0];
+                    let text: string = `__**Trivia**__\n${questionObject["question"]}`;
+                    console.log(text);
+                    console.log(questionObject["incorrect"]);
+                    console.log(questionObject["correct"]);
+                    console.log(questionObject);
+                    let answers: Array<string> = Array.from(questionObject["incorrect"]);
+                    answers.push(questionObject["correct"]);
+                    answers = lodash.sampleSize(answers, 4);
+                    let actionRow = new discordjs.MessageActionRow();
+                    let correctIndex: number;
+                    answers.forEach((answer, index) => {
+                        let answerButton = new discordjs.MessageButton()
+                            .setStyle('PRIMARY')
+                            .setCustomID(index.toString())
+                            .setLabel(answer);
+                        actionRow.addComponent(answerButton);
+                        if (answer == questionObject["correct"]) {
+                            correctIndex = index;
+                        }
+                    });
+                    await commandInteraction.reply(text, {
+                        components: [ actionRow ]
+                    })
+                        .catch(error => console.error(error));
+                    let daReply = await commandInteraction.fetchReply() as discordjs.Message;
+                    runningTrivias.push({
+                        "questionObject": questionObject,
+                        "answers": answers,
+                        "correctIndex": correctIndex,
+                        "reply": daReply.id,
+                        "channel": daReply.channel.id
+                    });
+                } else if (commandInteraction.options.find(option => option.name == 'poll')) {
+                    await commandInteraction.reply('This command is a placeholder and doesn\'t exist yet')
+                        .catch(error => console.error(error));
+                } else {
+                    await commandInteraction.reply('Well, this is awkward. That showcase doesn\'t seem to exist. If this issue persists, send an email to sig@puyo.xyz')
+                        .catch(error => console.error(error));
+                }
+                break;
+            default:
+                await commandInteraction.reply('Well, this is awkward. You seem to have ran a command that... doesn\'t exist? If this issue persists, send an email to sig@puyo.xyz')
+                    .catch(error => console.error(error));
+                break;
+        }
+    } else if (interaction.isMessageComponent()) {
+        let componentInteraction = interaction as discordjs.MessageComponentInteraction;
+        let reply = await componentInteraction.message;
+        let triviaInfo = runningTrivias.find(t => t["reply"] == reply.id);
+        let won: boolean = true;
+        if (triviaInfo != undefined) {
+            // add check for who pressed the button here
+            let actionRow = new discordjs.MessageActionRow();
+            triviaInfo["answers"].forEach((answer, index) => {
+                let style: discordjs.MessageButtonStyle = 'PRIMARY';
+                if (index == triviaInfo["correctIndex"]) {
+                    style = 'SUCCESS';
+                } else if (componentInteraction.customID == index.toString()) {
+                    style = 'DANGER';
+                    won = false;
+                } else {
+                    style = 'PRIMARY';
+                }
+                let answerButton = new discordjs.MessageButton()
+                    .setStyle(style)
+                    .setCustomID(index.toString())
+                    .setDisabled(true)
+                    .setLabel(answer);
+                actionRow.addComponent(answerButton);
+            });
+            componentInteraction.update(reply.content, { components: [ actionRow ] })
+                .catch(error => console.error(error));
+            runningTrivias.splice(runningTrivias.indexOf(triviaInfo), 1);
+        } else {
+            console.log("Doesn't exist?");
+        }
+    } else {
+        console.log("unknown interaction: " + interaction);
+        console.log(interaction.type);
+    }
+});

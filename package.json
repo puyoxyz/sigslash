@@ -15,7 +15,7 @@
     "sig",
     "shigu"
   ],
-  "author": "daniel11420",
+  "author": "Puyo or daniel11420 <hi@puyo.xyz>",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
     "url": "https://github.com/daniel11420/sigslash/issues"
@@ -23,10 +23,12 @@
   "homepage": "https://github.com/daniel11420/sigslash#readme",
   "dependencies": {
     "@types/node": "^14.0.5",
-    "better-sqlite3": "^7.0.1",
+    "discord-api-types": "^0.18.1",
+    "discord.js": "github:monbrey/discord.js#message-components",
     "figlet": "^1.4.0",
     "fs": "0.0.1-security",
+    "lodash": "^4.17.21",
     "table": "^5.4.6",
-    "typescript": "^3.9.3"
+    "typescript": "^4.3.2"
   }
 }

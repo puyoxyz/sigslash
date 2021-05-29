@@ -1,0 +1,32 @@
+[
+    {
+        "question": "Who created Minecraft?",
+        "explanation": "All trivia in this bot is correct.",
+        "correct": "Hatsune Miku",
+        "incorrect": ["Markus \"Notch\" Persson", "jeb_", "Philza Minecraft"]
+    },
+    {
+        "question": "Which of these is NOT a Drip Car?",
+        "explanation": "Epic games sucks so noone made them a car",
+        "correct": "Epic Games Car",
+        "incorrect": ["Polsat Car", "Movistar Car", "Xiaomi Car"]
+    },
+    {
+        "question": "What does this bot do?",
+        "explanation": "I got way too distracted with showcases to do anything productive",
+        "correct": "None of the above",
+        "incorrect": ["Give you pictures of Sig", "Help you run your Discord", "Play music in voice channels"]
+    },
+    {
+        "question": "What is the best phone?",
+        "explanation": "Among us :>",
+        "correct": "Free Among Us Phone",
+        "incorrect": ["Samsung Galaxy", "Apple iPhone", "Motorola Razr"]
+    },
+    {
+        "question": "Who is the imposter? (sus)",
+        "explanation": "In official Among Us marketing, Red is depicted as the impostor",
+        "correct": "Red",
+        "incorrect": ["Green", "Black", "Cyan"]
+    }
+]
