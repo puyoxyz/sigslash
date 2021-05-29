@@ -1,7 +1,4 @@
 import * as discordjs from 'discord.js';
-import * as fs from 'fs';
-let config = fs.readFileSync('./local/config.json');
-config = JSON.parse(config.toString());
 
 export class SigClient {
     client: discordjs.Client;

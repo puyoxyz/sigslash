@@ -3,6 +3,9 @@ import { table } from 'table';
 import * as figlet from 'figlet';
 import * as lodash from 'lodash';
 import * as fs from 'fs';
+import { SigClient } from './modules/SigClient';
+import { TriviaManager } from './modules/TriviaManager';
+
 let buffer: Buffer;
 buffer = fs.readFileSync('./local/config.json');
 let config = JSON.parse(buffer.toString());
@@ -12,10 +15,10 @@ buffer = fs.readFileSync('./local/trivia.json');
 let triviaQuestions = JSON.parse(buffer.toString());
 buffer = undefined;
 
-import { SigClient } from './sigclient';
 
 const sig = new SigClient(packageInfo, config.owner);
-let runningTrivias: Array<Object> = [];
+const triviaManager = new TriviaManager();
+//let runningTrivias: Array<Object> = [];
 //let runningPolls: Array<Object> = [];
 
 // SET UP DATABASE HERE
@@ -112,41 +115,7 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                     })
                         .catch(error => console.error(error));
                 } else if (commandInteraction.options.find(option => option.name == 'trivia')) {
-                    let questionObject = lodash.sampleSize(triviaQuestions, 1);
-                    questionObject = questionObject[0];
-                    let text: string = `__**Trivia**__\n${questionObject["question"]}`;
-                    /*console.log(text);
-                    console.log(questionObject["incorrect"]);
-                    console.log(questionObject["correct"]);
-                    console.log(questionObject);*/
-                    let answers: Array<string> = Array.from(questionObject["incorrect"]);
-                    answers.push(questionObject["correct"]);
-                    answers = lodash.sampleSize(answers, 4);
-                    let actionRow = new discordjs.MessageActionRow();
-                    let correctIndex: number;
-                    answers.forEach((answer, index) => {
-                        let answerButton = new discordjs.MessageButton()
-                            .setStyle('PRIMARY')
-                            .setCustomID(index.toString())
-                            .setLabel(answer);
-                        actionRow.addComponent(answerButton);
-                        if (answer == questionObject["correct"]) {
-                            correctIndex = index;
-                        }
-                    });
-                    await commandInteraction.reply(text, {
-                        components: [ actionRow ]
-                    })
-                        .catch(error => console.error(error));
-                    let daReply = await commandInteraction.fetchReply() as discordjs.Message;
-                    runningTrivias.push({
-                        "questionObject": questionObject,
-                        "answers": answers,
-                        "correctIndex": correctIndex,
-                        "reply": daReply.id,
-                        "channel": daReply.channel.id,
-                        "user": commandInteraction.user.id
-                    });
+                    triviaManager.startTrivia(interaction as discordjs.CommandInteraction);
                 } else if (commandInteraction.options.find(option => option.name == 'poll')) {
                     await commandInteraction.reply('This command is a placeholder and doesn\'t exist yet')
                         .catch(error => console.error(error));
@@ -162,46 +131,8 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
         }
     } else if (interaction.isMessageComponent()) {
         let componentInteraction = interaction as discordjs.MessageComponentInteraction;
-        let reply = await componentInteraction.message;
-        let triviaInfo = runningTrivias.find(t => t["reply"] == reply.id);
-        if (componentInteraction.user.id != triviaInfo["user"]) {
-            componentInteraction.reply("Sorry, this trivia isn't yours! You can play with `/showcase trivia`", { ephemeral: true });
-            return;
-        }
-        let won: boolean = true;
-        if (triviaInfo != undefined) {
-            // add check for who pressed the button here
-            let actionRow = new discordjs.MessageActionRow();
-            triviaInfo["answers"].forEach((answer: string, index: number) => {
-                let style: discordjs.MessageButtonStyle = 'PRIMARY';
-                if (index == triviaInfo["correctIndex"]) {
-                    style = 'SUCCESS';
-                } else if (componentInteraction.customID == index.toString()) {
-                    style = 'DANGER';
-                    won = false;
-                } else {
-                    style = 'PRIMARY';
-                }
-                let answerButton = new discordjs.MessageButton()
-                    .setStyle(style)
-                    .setCustomID(index.toString())
-                    .setDisabled(true)
-                    .setLabel(answer);
-                actionRow.addComponent(answerButton);
-            });
-            let wonText: string;
-            if (won) {
-                wonText = "Answered correctly";
-            } else {
-                wonText = "Answered incorrectly";
-            }
-            let text: string = `__**Trivia (${wonText})**__\n${triviaInfo["questionObject"]["question"]}\nThe answer was ${triviaInfo["questionObject"]["correct"]}.\nExplanation: ${triviaInfo["questionObject"]["explanation"]}`;
-            componentInteraction.update(text, { components: [ actionRow ] })
-                .catch(error => console.error(error));
-            runningTrivias.splice(runningTrivias.indexOf(triviaInfo), 1);
-        } else {
-            console.log("Doesn't exist?");
-            componentInteraction.reply("You seem to have answered a trivia that doesn't exist. Ooooops!", { ephemeral: true });
+        if (componentInteraction.customID.includes('showcase_trivia')) {
+            triviaManager.answerTrivia(interaction as discordjs.MessageComponentInteraction);
         }
     } else {
         console.log("unknown interaction: " + interaction);

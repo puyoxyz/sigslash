@@ -107,4 +107,5 @@ dist
 /local/
 
 # compiled stuff
-*.js
+dist/
+/dist/
