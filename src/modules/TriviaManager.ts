@@ -107,7 +107,7 @@ class TriviaManager {
         let text: string = `__**Trivia (${wonText})**__\n${triviaInfo.triviaQuestion.question}\nThe answer was ${triviaInfo.triviaQuestion.correct}.\nExplanation: ${triviaInfo.triviaQuestion.explanation}`;
 
         interaction.update(text, { components: [ actionRow ] })
-            .catch((error) => {throw error});
+            .catch((error) => { throw error; });
         this.runningTrivias.splice(this.runningTrivias.indexOf(triviaInfo), 1);
         return;
     }
