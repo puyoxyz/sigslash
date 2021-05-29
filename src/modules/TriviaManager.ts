@@ -56,7 +56,7 @@ class TriviaManager {
         if (typeof correctAnswerIndex === 'undefined') throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
         
         await interaction.reply(text, { components: [actionRow] })
-            .catch((error) => { throw error });
+            .catch((error) => { throw error; });
         
         let reply = await interaction.fetchReply() as discordjs.Message;
         this.runningTrivias.push({
