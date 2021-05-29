@@ -3,8 +3,8 @@ let required_config_version: number = 1;
 
 // Check if config version correct
 let fs = require('fs');
-declare var config;
-config = fs.readFileSync('./local/config.json');
+declare var config; // this makes it, like, global or whatever, so it can be used everywhere
+config = fs.readFileSync('../local/config.json');
 config = JSON.parse(config);
 
 if (config.config_version == required_config_version) {

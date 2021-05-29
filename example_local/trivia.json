@@ -1,0 +1,8 @@
+[
+    {
+        "question": "Example question?",
+        "explanation": "Explanation about why Correct Answer is the correct answer",
+        "correct": "Correct Answer",
+        "incorrect": ["Incorrect answer 1 of 3", "Incorrect answer 2 of 3", "Incorrect answer 3 of 3"]
+    }
+]

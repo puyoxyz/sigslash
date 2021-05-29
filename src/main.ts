@@ -110,10 +110,10 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                     let questionObject = lodash.sampleSize(triviaQuestions, 1);
                     questionObject = questionObject[0];
                     let text: string = `__**Trivia**__\n${questionObject["question"]}`;
-                    console.log(text);
+                    /*console.log(text);
                     console.log(questionObject["incorrect"]);
                     console.log(questionObject["correct"]);
-                    console.log(questionObject);
+                    console.log(questionObject);*/
                     let answers: Array<string> = Array.from(questionObject["incorrect"]);
                     answers.push(questionObject["correct"]);
                     answers = lodash.sampleSize(answers, 4);
@@ -139,7 +139,8 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                         "answers": answers,
                         "correctIndex": correctIndex,
                         "reply": daReply.id,
-                        "channel": daReply.channel.id
+                        "channel": daReply.channel.id,
+                        "user": commandInteraction.user.id
                     });
                 } else if (commandInteraction.options.find(option => option.name == 'poll')) {
                     await commandInteraction.reply('This command is a placeholder and doesn\'t exist yet')
@@ -158,6 +159,10 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
         let componentInteraction = interaction as discordjs.MessageComponentInteraction;
         let reply = await componentInteraction.message;
         let triviaInfo = runningTrivias.find(t => t["reply"] == reply.id);
+        if (componentInteraction.user.id != triviaInfo["user"]) {
+            componentInteraction.reply("Sorry, this trivia isn't yours! You can play with `/showcase trivia`", { ephemeral: true });
+            return;
+        }
         let won: boolean = true;
         if (triviaInfo != undefined) {
             // add check for who pressed the button here
@@ -179,11 +184,19 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                     .setLabel(answer);
                 actionRow.addComponent(answerButton);
             });
-            componentInteraction.update(reply.content, { components: [ actionRow ] })
+            let wonText: string;
+            if (won) {
+                wonText = "Answered correctly";
+            } else {
+                wonText = "Answered incorrectly";
+            }
+            let text: string = `__**Trivia (${wonText})**__\n${triviaInfo["questionObject"]["question"]}\nThe answer was ${triviaInfo["questionObject"]["correct"]}.\nExplanation: ${triviaInfo["questionObject"]["explanation"]}`;
+            componentInteraction.update(text, { components: [ actionRow ] })
                 .catch(error => console.error(error));
             runningTrivias.splice(runningTrivias.indexOf(triviaInfo), 1);
         } else {
             console.log("Doesn't exist?");
+            componentInteraction.reply("You seem to have answered a trivia that doesn't exist. Ooooops!", { ephemeral: true });
         }
     } else {
         console.log("unknown interaction: " + interaction);
