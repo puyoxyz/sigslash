@@ -56,8 +56,10 @@ class TriviaManager {
             }
         });
         if (correctAnswerIndex == undefined) throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
+        
         await interaction.reply(text, { components: [actionRow] })
             .catch(error => { throw error });
+        
         let reply = await interaction.fetchReply() as discordjs.Message;
         this.runningTrivias.push({
             triviaQuestion: question,
@@ -66,6 +68,7 @@ class TriviaManager {
             replyId: reply.id as Snowflake, // TODO: remove cast when the djs people fix it
             userPlaying: interaction.user.id
         });
+        
         return this.getTriviaInfo(reply.id as Snowflake);
     }
 
