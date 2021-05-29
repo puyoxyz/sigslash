@@ -4,8 +4,8 @@
         "You shouldn't modify these, these are just for reading. They'll tell you what to put in fields."
     ],
 
-    "#config_version": "You shouldn't change this, the bot uses this to check if your config is up-to-date.",
-    "config_version": 1,
+    "#configVersion": "You shouldn't change this, the bot uses this to check if your config is up-to-date.",
+    "configVersion": 1,
 
     "#token": "Here, you should put your Discord bot token. You can get it at the developers page (click your application and click bot) https://discord.com/developers",
     "token": "",

@@ -24,7 +24,7 @@ const triviaManager = new TriviaManager();
 // SET UP DATABASE HERE
 
 sig.client.once('ready', async () => {
-    sig.client.user.setActivity(config.activity.text, {type: config.activity.type}) // Setting the activity
+    sig.client.user.setActivity(config.activity.text, {type: config.activity.type}); // Setting the activity
     console.log("I WOULD LOG THAT WE CHANGED THE PRESENCE HERE BUT APPARENTLY PROMISES ARE CRINGE NOW!!!!! THANKS DJS");
     
     // Logging basic info
@@ -109,14 +109,14 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                 break;
             case 'showcase':
                 //commandInteraction.defer();
-                if (commandInteraction.options.find(option => option.name == 'ephemeral')) {
+                if (commandInteraction.options.find((option) => option.name == 'ephemeral')) {
                     await commandInteraction.reply('I was hula hooping. Kevin and I attend a class for fitness and for fun.\nI\'ve mastered all the moves: the pizza toss, the tornado, the scorpion, the oopsie-doodle.\nBut because this is an ephemeral message, noone will ever believe you.\nhttps://image-host.club/QgxfaXOz.png', {
                         ephemeral: true
                     })
                         .catch(error => console.error(error));
-                } else if (commandInteraction.options.find(option => option.name == 'trivia')) {
+                } else if (commandInteraction.options.find((option) => option.name == 'trivia')) {
                     triviaManager.startTrivia(interaction as discordjs.CommandInteraction);
-                } else if (commandInteraction.options.find(option => option.name == 'poll')) {
+                } else if (commandInteraction.options.find((option) => option.name == 'poll')) {
                     await commandInteraction.reply('This command is a placeholder and doesn\'t exist yet')
                         .catch(error => console.error(error));
                 } else {

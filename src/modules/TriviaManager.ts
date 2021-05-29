@@ -51,20 +51,20 @@ class TriviaManager {
                 .setCustomID(`showcase_trivia_${index.toString()}`)
                 .setLabel(answer);
             actionRow.addComponent(answerButton);
-            if (answer == question.correct) {
+            if (answer === question.correct) {
                 correctAnswerIndex = index;
             }
         });
         if (correctAnswerIndex == undefined) throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
         
         await interaction.reply(text, { components: [actionRow] })
-            .catch(error => { throw error });
+            .catch((error) => { throw error });
         
         let reply = await interaction.fetchReply() as discordjs.Message;
         this.runningTrivias.push({
             triviaQuestion: question,
-            orderedAnswers: orderedAnswers,
-            correctAnswerIndex: correctAnswerIndex,
+            orderedAnswers,
+            correctAnswerIndex,
             replyId: reply.id as Snowflake, // TODO: remove cast when the djs people fix it
             userPlaying: interaction.user.id
         });

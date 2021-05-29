@@ -16,7 +16,7 @@ export class SigClient {
             intents: ['GUILDS', 'GUILD_MESSAGES', 'DIRECT_MESSAGES']
         });
 
-        this.client.on('message', message => {
+        this.client.on('message', (message) => {
             if (message.author.bot) return false;
             
             if (message.mentions.has(this.client.user, {ignoreRoles: true, ignoreEveryone: true})) {
@@ -28,7 +28,7 @@ export class SigClient {
                 if (!this.registeredGuildCommands[message.guild.id]) {
                     this.registeredGuildCommands[message.guild.id] = [];
                 }
-                let reply: string = "```\n";
+                let reply: string = '```\n';
                 this.commands.forEach(async (command, index) => {
                     if (!this.registeredGuildCommands[message.guild.id].includes(command.name)) {
                         let registeredCommand = await message.guild.commands.create(command)
@@ -38,9 +38,9 @@ export class SigClient {
                         reply.concat(`Command ${command.name} is already registered for guild ${message.guild.id}`);
                     }
                 });
-                reply += "```";
-                if (reply == "```\n```") {
-                    reply = "```\nNo duplicates occured while deploying\n```"
+                reply += '```';
+                if (reply == '```\n```') {
+                    reply = '```\nNo duplicates occured while deploying\n```';
                 } // TODO: this doesnt really work. fix it later lol i guess
                 message.channel.send(reply);
             }
