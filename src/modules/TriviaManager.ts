@@ -51,9 +51,7 @@ class TriviaManager {
                 .setCustomID(`showcase_trivia_${index.toString()}`)
                 .setLabel(answer);
             actionRow.addComponent(answerButton);
-            if (answer === question.correct) {
-                correctAnswerIndex = index;
-            }
+            if (answer === question.correct) correctAnswerIndex = index;
         });
         if (typeof correctAnswerIndex === 'undefined') throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
         
@@ -92,14 +90,11 @@ class TriviaManager {
         let actionRow = new discordjs.MessageActionRow();
         triviaInfo.orderedAnswers.forEach((answer: string, index: number) => {
             let style: discordjs.MessageButtonStyle = 'PRIMARY';
-            if (index === triviaInfo.correctAnswerIndex) {
-                style = 'SUCCESS';
-            } else if (interaction.customID === `showcase_trivia_${index.toString()}`) {
+            if (index === triviaInfo.correctAnswerIndex) style = 'SUCCESS';
+            else if (interaction.customID === `showcase_trivia_${index.toString()}`) {
                 style = 'DANGER';
                 won = false;
-            } else {
-                style = 'PRIMARY';
-            }
+            } else style = 'PRIMARY';
             let answerButton = new discordjs.MessageButton()
                 .setStyle(style)
                 .setCustomID(`showcase_trivia_${index.toString()}`)

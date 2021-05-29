@@ -114,9 +114,8 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
                         ephemeral: true
                     })
                         .catch((error) => console.error(error));
-                } else if (commandInteraction.options.find((option) => option.name === 'trivia')) {
-                    triviaManager.startTrivia(interaction as discordjs.CommandInteraction);
-                } else if (commandInteraction.options.find((option) => option.name === 'poll')) {
+                } else if (commandInteraction.options.find((option) => option.name === 'trivia')) triviaManager.startTrivia(interaction as discordjs.CommandInteraction);
+                else if (commandInteraction.options.find((option) => option.name === 'poll')) {
                     await commandInteraction.reply('This command is a placeholder and doesn\'t exist yet')
                         .catch((error) => console.error(error));
                 } else {
@@ -131,9 +130,7 @@ sig.client.on('interaction', async (interaction: discordjs.Interaction) => {
         }
     } else if (interaction.isMessageComponent()) {
         let componentInteraction = interaction as discordjs.MessageComponentInteraction;
-        if (componentInteraction.customID.includes('showcase_trivia')) {
-            triviaManager.answerTrivia(interaction as discordjs.MessageComponentInteraction);
-        }
+        if (componentInteraction.customID.includes('showcase_trivia')) triviaManager.answerTrivia(interaction as discordjs.MessageComponentInteraction);
     } else {
         console.log('unknown interaction: ' + interaction);
         console.log(interaction.type);
