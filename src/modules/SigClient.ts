@@ -23,9 +23,7 @@ export class SigClient {
 
             if (message.author.id === this.owner && message.content.toLowerCase().includes('deploy test commands')) {
                 message.reply('Deploying guild commands!');
-                if (!this.registeredGuildCommands[message.guild.id]) {
-                    this.registeredGuildCommands[message.guild.id] = [];
-                }
+                if (!this.registeredGuildCommands[message.guild.id]) this.registeredGuildCommands[message.guild.id] = [];
                 let reply: string = '```\n';
                 this.commands.forEach(async (command, index) => {
                     if (!this.registeredGuildCommands[message.guild.id].includes(command.name)) {
