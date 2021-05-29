@@ -28,11 +28,11 @@ class TriviaManager {
         let buffer: Buffer;
         buffer = fs.readFileSync('./local/trivia.json');
         this.questions = JSON.parse(buffer.toString()) as Array<TriviaQuestion>;
-        buffer = undefined;
+        buffer = void 0;
     }
 
     getTriviaInfo(replyId: Snowflake): RunningTriviaInfo {
-        return this.runningTrivias.find((trivia: RunningTriviaInfo) => trivia.replyId == replyId);
+        return this.runningTrivias.find((trivia: RunningTriviaInfo) => trivia.replyId === replyId);
     }
 
     async startTrivia(interaction: discordjs.CommandInteraction): Promise<RunningTriviaInfo> {
@@ -55,7 +55,7 @@ class TriviaManager {
                 correctAnswerIndex = index;
             }
         });
-        if (correctAnswerIndex == undefined) throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
+        if (typeof correctAnswerIndex === 'undefined') throw new Error(`Trivia question "${question.question}" is invalid (correctAnswerIndex did not get set)`);
         
         await interaction.reply(text, { components: [actionRow] })
             .catch((error) => { throw error });
@@ -76,15 +76,15 @@ class TriviaManager {
         let reply = interaction.message;
         let triviaInfo = this.getTriviaInfo(reply.id as Snowflake); // TODO: remove cast when the djs people fix it
         
-        if (triviaInfo == undefined) {
+        if (typeof triviaInfo === 'undefined') {
             interaction.reply(`Sorry, the trivia you tried to answer doesn't exist. (did you already answer it?)\nYou can play again with \`/showcase trivia\``, { ephemeral: true })
-                .catch(error => console.error(error));
+                .catch((error) => console.error(error));
             return;
         }
 
-        if (interaction.user.id != triviaInfo.userPlaying) {
+        if (interaction.user.id !== triviaInfo.userPlaying) {
             interaction.reply(`Sorry, this trivia is being played by <@${triviaInfo.userPlaying.toString()}>!\nYou can play with \`/showcase trivia\``, { ephemeral: true })
-                .catch(error => console.error(error));
+                .catch((error) => console.error(error));
             return;
         }
 
@@ -92,9 +92,9 @@ class TriviaManager {
         let actionRow = new discordjs.MessageActionRow();
         triviaInfo.orderedAnswers.forEach((answer: string, index: number) => {
             let style: discordjs.MessageButtonStyle = 'PRIMARY';
-            if (index == triviaInfo.correctAnswerIndex) {
+            if (index === triviaInfo.correctAnswerIndex) {
                 style = 'SUCCESS';
-            } else if (interaction.customID == `showcase_trivia_${index.toString()}`) {
+            } else if (interaction.customID === `showcase_trivia_${index.toString()}`) {
                 style = 'DANGER';
                 won = false;
             } else {
@@ -108,14 +108,14 @@ class TriviaManager {
             actionRow.addComponent(answerButton);
         });
 
-        let wonText: string = won ? "Answered correctly" : "Answered incorrectly";
+        let wonText: string = won ? 'Answered correctly' : 'Answered incorrectly';
         let text: string = `__**Trivia (${wonText})**__\n${triviaInfo.triviaQuestion.question}\nThe answer was ${triviaInfo.triviaQuestion.correct}.\nExplanation: ${triviaInfo.triviaQuestion.explanation}`;
 
         interaction.update(text, { components: [ actionRow ] })
-            .catch(error => {throw error});
+            .catch((error) => {throw error});
         this.runningTrivias.splice(this.runningTrivias.indexOf(triviaInfo), 1);
         return;
     }
 }
 
-export { TriviaQuestion, RunningTriviaInfo, TriviaManager }
+export { TriviaQuestion, RunningTriviaInfo, TriviaManager };

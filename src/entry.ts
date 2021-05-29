@@ -5,7 +5,7 @@ let requiredConfigVersion: number = 1;
 import * as fs from 'fs';
 let buffer = fs.readFileSync('./local/config.json');
 let config = JSON.parse(buffer.toString());
-buffer = undefined;
+buffer = void 0;
 
 if (config.configVersion === requiredConfigVersion) {
     console.log('Config version correct, starting.');
